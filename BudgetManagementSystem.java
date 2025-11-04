@@ -4,55 +4,39 @@ import java.sql.*;
 import java.text.*;
 import java.util.Date;
 
-/**
- * BudgetManagementSystem - AWT single-page CRUD app using MySQL.
- *
- * Notes:
- * - Change DB_URL, DB_USER, DB_PASS to match your MySQL setup.
- * - Requires MySQL Connector/J (e.g., mysql-connector-j-8.x.x.jar) on classpath.
- */
+
 public class BudgetManagementSystem extends Frame implements ActionListener {
-    // DB connection details - change as needed
     private static final String DB_URL = "jdbc:mysql://localhost:3306/budgetdb?useSSL=false&serverTimezone=UTC";
     private static final String DB_USER = "root";
-    private static final String DB_PASS = "Ranjith@123"; // IMPORTANT: Change this to your MySQL root password
+    private static final String DB_PASS = "Ranjith@123"; 
 
-    // UI components
     private Label lblId, lblDate, lblCategory, lblDesc, lblAmount, lblType, lblSearch;
     private TextField tfId, tfDate, tfCategory, tfAmount, tfSearch;
     private TextArea taDescription, taOutput;
     private Choice chType;
     private Button btnCreate, btnRead, btnUpdate, btnDelete, btnListAll, btnClear, btnSearch;
 
-    // DB connection (opened/closed per operation)
     public BudgetManagementSystem() {
         super("Budget Management System - AWT");
 
-        // -- UI STYLING --
-        // Colors
-        Color bgColor = new Color(240, 240, 240); // Light gray
-        Color btnColor = new Color(70, 130, 180); // Steel blue
-        Color textColor = new Color(50, 50, 50);   // Dark gray
-        Color accentColor = new Color(255, 255, 255); // White
+        Color bgColor = new Color(240, 240, 240); 
+        Color btnColor = new Color(70, 130, 180); 
+        Color textColor = new Color(50, 50, 50);   
+        Color accentColor = new Color(255, 255, 255); 
 
-        // Font
         Font defaultFont = new Font("Segoe UI", Font.PLAIN, 14);
         Font boldFont = new Font("Segoe UI", Font.BOLD, 14);
 
-        // -- LAYOUT --
         setLayout(new BorderLayout(10, 10));
         setBackground(bgColor);
 
-        // Main container panel with padding
         Panel mainPanel = new Panel(new BorderLayout(10, 10));
 
-        // Form Panel (using GridBagLayout for flexibility)
         Panel formPanel = new Panel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); // Padding around components
+        gbc.insets = new Insets(5, 5, 5, 5); 
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Helper method to create styled labels
         Label[] labels = {
             lblId = new Label("ID (for update/delete):"),
             lblDate = new Label("Date (yyyy-MM-dd):"),
@@ -66,7 +50,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
             lbl.setForeground(textColor);
         }
 
-        // Form components
         tfId = new TextField(10);
         tfDate = new TextField(new SimpleDateFormat("yyyy-MM-dd").format(new Date()), 20);
         tfCategory = new TextField(20);
@@ -81,7 +64,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
             c.setFont(defaultFont);
         }
 
-        // Add components to form panel using GridBagLayout
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(lblId, gbc);
         gbc.gridx = 1; gbc.gridy = 0; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; formPanel.add(tfId, gbc);
         gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; formPanel.add(lblDate, gbc);
@@ -95,7 +77,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         gbc.gridx = 0; gbc.gridy = 5; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; formPanel.add(lblType, gbc);
         gbc.gridx = 1; gbc.gridy = 5; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; formPanel.add(chType, gbc);
 
-        // Action Buttons Panel
         Panel actionsPanel = new Panel(new GridLayout(3, 2, 8, 8));
         btnCreate = new Button("Create");
         btnRead   = new Button("Read by ID");
@@ -113,12 +94,10 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
             actionsPanel.add(btn);
         }
 
-        // Top panel containing form and actions
         Panel topPanel = new Panel(new BorderLayout(20, 0));
         topPanel.add(formPanel, BorderLayout.CENTER);
         topPanel.add(actionsPanel, BorderLayout.EAST);
 
-        // Bottom area for search and output
         Panel bottomPanel = new Panel(new BorderLayout(10, 10));
         Panel searchPanel = new Panel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         lblSearch = new Label("Search:");
@@ -144,19 +123,16 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(bottomPanel, BorderLayout.CENTER);
 
-        // Add a border/padding to the main frame
         add(new Panel(), BorderLayout.NORTH);
         add(new Panel(), BorderLayout.SOUTH);
         add(new Panel(), BorderLayout.EAST);
         add(new Panel(), BorderLayout.WEST);
         add(mainPanel, BorderLayout.CENTER);
 
-        // Window settings
         setSize(950, 600);
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Window close handler
         addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e){
                 dispose();
@@ -165,7 +141,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         });
     }
 
-    // Validate numeric amount
     private boolean isValidAmount(String s) {
         try {
             Double.parseDouble(s);
@@ -175,7 +150,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         }
     }
 
-    // Clear form fields
     private void clearForm() {
         tfId.setText("");
         tfDate.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
@@ -186,7 +160,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         taOutput.setText("");
     }
 
-    // Action handling
     @Override
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
@@ -207,17 +180,15 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         }
     }
 
-    // DB helper: get connection
     private Connection getConnection() throws SQLException {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // load driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            // If driver not found, user will see exception when attempting DB ops
+
         }
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
     }
 
-    // Create (INSERT)
     private void createEntry() {
         String date = tfDate.getText().trim();
         String category = tfCategory.getText().trim();
@@ -259,7 +230,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         }
     }
 
-    // Read (by ID)
     private void readEntry() {
         String idStr = tfId.getText().trim();
         if (idStr.isEmpty()) {
@@ -288,7 +258,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         }
     }
 
-    // Update
     private void updateEntry() {
         String idStr = tfId.getText().trim();
         if (idStr.isEmpty()) {
@@ -333,7 +302,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         }
     }
 
-    // Delete
     private void deleteEntry() {
         String idStr = tfId.getText().trim();
         if (idStr.isEmpty()) {
@@ -356,7 +324,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         }
     }
 
-    // List all
     private void listAll() {
         String sql = "SELECT id, date, category, description, amount, type FROM budget_entries ORDER BY date DESC, id DESC";
         StringBuilder sb = new StringBuilder();
@@ -381,7 +348,6 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
         }
     }
 
-    // Search (by partial category or description)
     private void searchEntries() {
         String q = tfSearch.getText().trim();
         if (q.isEmpty()) {
@@ -419,12 +385,8 @@ public class BudgetManagementSystem extends Frame implements ActionListener {
     }
 
     public static void main(String[] args) {
-        // Optional: allow DB credentials via command-line
         if (args.length >= 3) {
-            // override defaults if provided: DB_URL DB_USER DB_PASS
-            // Example: java BudgetManagementSystem "jdbc:mysql://..." root secret
             try {
-                // Not ideal to change constants; but just for quick override:
                 java.lang.reflect.Field fUrl = BudgetManagementSystem.class.getDeclaredField("DB_URL");
                 java.lang.reflect.Field fUser = BudgetManagementSystem.class.getDeclaredField("DB_USER");
                 java.lang.reflect.Field fPass = BudgetManagementSystem.class.getDeclaredField("DB_PASS");
